@@ -36,25 +36,24 @@ const List<String> cryptoList = [
 
 
 const String baseURL = 'https://rest.coinapi.io/v1/exchangerate';
-//const String apiKey = 'INSERT-YOUR-KEY-HERE';
+const String apiKey = 'C08AA1E7-8FF3-48DC-ACC5-40F3D24867D0';
 const String path = '/Users/noelangeloborneo/AndroidStudioProjects/bitcoin-ticker-flutter/lib/json/config.json';
 
 class CoinData {
 
   Future<String> getCoinData(String crypto, String fiat) async {
-
-    String apiKey = await authenticate();
+//    String apiKey = await authenticate();
+    String uri = '$baseURL/$crypto/$fiat';
+    print('$uri : $apiKey');
     var response = await http.get(
-        '$baseURL/$crypto/$fiat',
-        headers: {'X-CoinAPI-Key': apiKey}
+        uri, headers: {'X-CoinAPI-Key': apiKey}
     );
 
     if (response.statusCode == 200) {
       var jsonResponse = convert.jsonDecode(response.body);
       var rate = jsonResponse['rate'].round();
-
       return NumberFormat.simpleCurrency(name: fiat).format(rate).toString();
-    }
+    } else print(response.body.toString());
     return null;
   }
 }

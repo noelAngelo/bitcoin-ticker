@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../misc/coin_data.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
@@ -44,9 +45,20 @@ class _PriceScreenState extends State<PriceScreen> {
       children: currenciesList.map((currency) => new Text(currency)).toList());
   }
   List<Widget> getCardList(CoinData data, String currency) {
-    return cryptoList.map((crypto) => CryptoCard(coinData: data, selectedCrypto: crypto, selectedCurrency: currency)).toList();
+    return cryptoList.map((crypto) => new CryptoCard(coinData: data, selectedCrypto: crypto, selectedCurrency: currency)).toList();
   }
-
+  List<Widget> getCurrencyList() {
+    return currenciesList.map((e) =>
+        ListTile(
+          title: Text(e),
+          onTap: () {
+            setState(() {
+              _selectedCurrency = e;
+            });
+            Navigator.pop(context);
+          },
+        )).toList();
+  }
 
   @override
   void initState() {
@@ -61,6 +73,17 @@ class _PriceScreenState extends State<PriceScreen> {
       appBar: AppBar(
         title: Text('🤑 Coin Ticker'),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.monetization_on,
+        ),
+        onPressed: () {
+          showBarModalBottomSheet(
+              context: context,
+              builder: (context, scrollController) =>
+                  Scaffold(body: ListView(children: getCurrencyList()))
+          );},
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -68,13 +91,6 @@ class _PriceScreenState extends State<PriceScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: getCardList(coinData, _selectedCurrency)
-          ),
-          Container(
-            height: 150.0,
-            alignment: Alignment.center,
-            padding: EdgeInsets.only(bottom: 30.0),
-            color: Colors.lightBlue,
-            child: Platform.isIOS ? iOSPicker() : androidDropdown()
           ),
         ],
       ),
@@ -97,7 +113,6 @@ class CryptoCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
       child: Card(
-        color: Colors.lightBlueAccent,
         elevation: 5.0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
